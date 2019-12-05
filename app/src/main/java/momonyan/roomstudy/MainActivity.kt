@@ -27,21 +27,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        database =
-            Room.databaseBuilder(this, AppDatabase::class.java, "UsersData.db").build()
+        //データベースの初期宣言
 
         recyclerAdapter = RecyclerAdapter(this)
 
-        database.usersDAO().findAll().observe(this, Observer<List<Users>> { users ->
-            data = users
-            recyclerAdapter.setList(data)
-
-            mainRecyclerView.also {
-                it.adapter = recyclerAdapter
-                it.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-
-            }
-        })
+        //データをデータベースから取り出し、RecyclerViewに適用
 
         ArrayAdapter.createFromResource(
             this,
@@ -64,24 +54,13 @@ class MainActivity : AppCompatActivity() {
 
                 when (spinnerParent.selectedItem as String) {
                     "女" -> {
-                        database.usersDAO().findGender(false)
-                            .observe(this@MainActivity, Observer<List<Users>> { users ->
-                                data = users
-                                recyclerAdapter.setList(data)
-                            })
+                        //女が選択された時、UsersDaoのfindGenderを使ってデータを適用
                     }
                     "男" -> {
-                        database.usersDAO().findGender(true)
-                            .observe(this@MainActivity, Observer<List<Users>> { users ->
-                                data = users
-                                recyclerAdapter.setList(data)
-                            })
+                        //男が選択された時、UsersDaoのfindGenderを使ってデータを適用
                     }
                     else -> {
-                        database.usersDAO().findAll().observe(this@MainActivity, Observer<List<Users>> { users ->
-                                data = users
-                                recyclerAdapter.setList(data)
-                            })
+                        //何も選択されていない時のデータを適用
                     }
                 }
             }

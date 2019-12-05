@@ -26,19 +26,16 @@ class AddActivity : AppCompatActivity() {
             }
 
             when {
-                name.isEmpty() -> {
-                    Toast.makeText(this, "名前を入力してください", Toast.LENGTH_LONG).show()
-                }
-                age.isEmpty() -> {
-                    Toast.makeText(this, "年齢を入力してください", Toast.LENGTH_LONG).show()
-                }
+                //名前が入力されていなかった場合
+
+                //年齢が入力されていなかった場合
+
+                //全て入力されていた場合
                 else -> {
-                    val userData = Users(name = name, age = age.toInt(), gender = gender, hobby = hobby)
-                    val database =
-                        Room.databaseBuilder(this, AppDatabase::class.java, "UsersData.db").build()
-                    Completable.fromAction { database.usersDAO().insertUsers(userData) }
-                        .subscribeOn(Schedulers.io())
-                        .subscribe()
+                    //データを入力
+
+                    //データベースにデータを入力
+
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
                 }

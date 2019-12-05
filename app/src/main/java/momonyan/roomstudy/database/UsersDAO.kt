@@ -8,6 +8,7 @@ import androidx.room.Query
 
 @Dao
 interface UsersDAO {
+    //DAO(Data Access Object)を作り、どのようなデータを取得するか指定する
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertUsers(users: Users)
 
