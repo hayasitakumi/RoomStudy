@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">RoomStudy</string>
+    <string-array name="planets_array">
+        <item></item>
+        <item>男</item>
+        <item>女</item>
+    </string-array>
 </resources>

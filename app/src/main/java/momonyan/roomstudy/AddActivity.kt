@@ -2,6 +2,7 @@ package momonyan.roomstudy
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.room.Room
 import io.reactivex.Completable
@@ -16,22 +17,32 @@ class AddActivity : AppCompatActivity() {
         setContentView(R.layout.add_item_layout)
         button2.setOnClickListener {
             val name = addNameEdit.text.toString()
-            val age = addAgeEdit.text.toString().toInt()
+            val age = addAgeEdit.text.toString()
             val gender = toggleButton2.isChecked
             val hobby = if (addHobbyEdit.text.toString() == "") {
                 null
             } else {
                 addHobbyEdit.text.toString()
             }
-            val userData = Users(name = name, age = age, gender = gender, hobby = hobby)
-            val database =
-                Room.databaseBuilder(this, AppDatabase::class.java, "UsersData.db").build()
 
-            Completable.fromAction { database.usersDAO().insertUsers(userData) }
-                .subscribeOn(Schedulers.io())
-                .subscribe()
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+            when {
+                name.isEmpty() -> {
+                    Toast.makeText(this, "名前を入力してください", Toast.LENGTH_LONG).show()
+                }
+                age.isEmpty() -> {
+                    Toast.makeText(this, "年齢を入力してください", Toast.LENGTH_LONG).show()
+                }
+                else -> {
+                    val userData = Users(name = name, age = age.toInt(), gender = gender, hobby = hobby)
+                    val database =
+                        Room.databaseBuilder(this, AppDatabase::class.java, "UsersData.db").build()
+                    Completable.fromAction { database.usersDAO().insertUsers(userData) }
+                        .subscribeOn(Schedulers.io())
+                        .subscribe()
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                }
+            }
         }
     }
 }

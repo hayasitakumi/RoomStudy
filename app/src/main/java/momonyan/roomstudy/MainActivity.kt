@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -19,7 +20,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var database: AppDatabase
 
     private lateinit var data: List<Users>
-    private var item = ""
+
+    private lateinit var recyclerAdapter: RecyclerAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -27,14 +30,30 @@ class MainActivity : AppCompatActivity() {
         database =
             Room.databaseBuilder(this, AppDatabase::class.java, "UsersData.db").build()
 
+        recyclerAdapter = RecyclerAdapter(this)
+
         database.usersDAO().findAll().observe(this, Observer<List<Users>> { users ->
             data = users
+            recyclerAdapter.setList(data)
 
-            mainRecyclerView.adapter = RecyclerAdapter(this, data)
-            mainRecyclerView.layoutManager =
-                LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+            mainRecyclerView.also {
+                it.adapter = recyclerAdapter
+                it.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
+            }
         })
+
+        ArrayAdapter.createFromResource(
+            this,
+            R.array.planets_array,
+            android.R.layout.simple_spinner_item
+        ).also { adapter ->
+            // Specify the layout to use when the list of choices appears
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            // Apply the adapter to the spinner
+            spinner.adapter = adapter
+        }
+
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             //　アイテムが選択された時
             override fun onItemSelected(
@@ -42,28 +61,34 @@ class MainActivity : AppCompatActivity() {
                 view: View?, position: Int, id: Long
             ) {
                 val spinnerParent = parent as Spinner
-                item = spinnerParent.selectedItem as String
 
+                when (spinnerParent.selectedItem as String) {
+                    "女" -> {
+                        database.usersDAO().findGender(false)
+                            .observe(this@MainActivity, Observer<List<Users>> { users ->
+                                data = users
+                                recyclerAdapter.setList(data)
+                            })
+                    }
+                    "男" -> {
+                        database.usersDAO().findGender(true)
+                            .observe(this@MainActivity, Observer<List<Users>> { users ->
+                                data = users
+                                recyclerAdapter.setList(data)
+                            })
+                    }
+                    else -> {
+                        database.usersDAO().findAll().observe(this@MainActivity, Observer<List<Users>> { users ->
+                                data = users
+                                recyclerAdapter.setList(data)
+                            })
+                    }
+                }
             }
+
             //　アイテムが選択されなかった
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 //
-            }
-        }
-
-        button.setOnClickListener {
-            if (item == "男") {
-                database.usersDAO().findGender(false).observe(this, Observer<List<Users>> { users ->
-                    data = users
-                })
-            } else if (item == "女") {
-                database.usersDAO().findGender(true).observe(this, Observer<List<Users>> { users ->
-                    data = users
-                })
-            } else {
-                database.usersDAO().findAll().observe(this, Observer<List<Users>> { users ->
-                    data = users
-                })
             }
         }
 

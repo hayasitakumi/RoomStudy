@@ -17,5 +17,4 @@ interface UsersDAO {
     //f:Man t:Woman
     @Query("SELECT * FROM Users WHERE gender == :gender")
     fun findGender(gender: Boolean): LiveData<List<Users>>
-
 }
